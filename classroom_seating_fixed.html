@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>1-7 クラスの席テーブル</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+    table {
+      border-collapse: collapse;
+      margin: 20px auto;
+    }
+    td {
+      border: 1px solid #333;
+      padding: 8px;
+      width: 110px;
+      height: 50px;
+      text-align: center;
+    }
+    td.blocked {
+      background-color: #444;
+      color: #fff;
+    }
+    td.empty {
+      border: none;
+      background-color: transparent;
+    }
+    td.blank {
+      background-color: #eee;
+      color: #999;
+    }
+    input, button {
+      padding: 6px 10px;
+      margin: 5px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎲 1-7 クラスの席テーブル</h1>
+<button onclick="shuffleSeats()">席を決定！</button>
+
+<h3>🔍 自分の席を探す</h3>
+<input type="text" id="searchName" placeholder="出席番号または名前">
+<button onclick="searchSeat()">検索</button>
+
+<table id="seatTable"></table>
+
+<p id="result"></p>
+
+<script>
+  const students = [
+    { id: "01", name: "RASHMI" },
+    { id: "02", name: "RANDIL" },
+    { id: "03", name: "DAHAL RAJ" },
+    { id: "04", name: "PHAM THI THU HUONG" },
+    { id: "05", name: "SHEHAN" },
+    { id: "06", name: "NGUYEN THE LINH" },
+    { id: "07", name: "BAWANTHA" },
+    { id: "08", name: "SURAJ" },
+    { id: "09", name: "KUSHAL" },
+    { id: "10", name: "VISHMI %" },
+    { id: "11", name: "JUNAID" },
+    { id: "12", name: "DAHAL SANTOSH" },
+    { id: "13", name: "THARINDU" },
+    { id: "14", name: "DINESH" },
+    { id: "15", name: "ALI USMAN" },
+    { id: "16", name: "SAUD MANOJ" },
+    { id: "17", name: "SAMITH" },
+    { id: "18", name: "GOPALI DIKSHYA" },
+    { id: "19", name: "ALAMIN" },
+    { id: "20", name: "SHRISHA" },
+    { id: "21", name: "DAS BIKASH KUMAR" },
+    { id: "22", name: "NISHADHI" },
+    { id: "23", name: "ANJALEE" },
+    { id: "24", name: "NIKEE" },
+    { id: "25", name: "NGUYEN THANH TAM" },
+    { id: "26", name: "UDAYA" },
+    { id: "27", name: "OCHIR" },
+    { id: "28", name: "ZAFRI HASAN" },
+    { id: "29", name: "SABIN" },
+    { id: "30", name: "I PEREZ JASOND" },
+    { id: "31", name: "BYAMBAJARGAL" },
+    { id: "32", name: "ZHOU QINYU" }
+  ];
+
+  const layout = [4, 4, 5, 5, 5, 5, 4]; // 列ごとの席数
+  const blockedSeat = { col: 7, row: 0 };
+  let currentSeats = [];
+
+  function shuffleSeats() {
+    const shuffled = [...students];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    currentSeats = [];
+    const maxRows = Math.max(...layout);
+    const table = document.getElementById("seatTable");
+    table.innerHTML = "";
+
+    for (let row = 0; row < maxRows; row++) {
+      const tr = document.createElement("tr");
+
+      for (let col = 0; col < layout.length; col++) {
+        const td = document.createElement("td");
+
+        if (row < layout[col]) {
+          if (row === blockedSeat.row && col === blockedSeat.col) {
+            td.textContent = "×";
+            td.className = "blocked";
+            currentSeats.push(null);
+          } else {
+            const student = shuffled.shift() || null;
+            if (student) {
+              td.textContent = `${student.id} ${student.name}`;
+            } else {
+              td.textContent = "";
+            }
+            td.className = student ? "" : "blank";
+            currentSeats.push(student);
+          }
+        } else {
+          td.className = "empty";
+          td.textContent = "";
+          currentSeats.push(null);
+        }
+
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+
+    document.getElementById("result").textContent = "";
+  }
+
+  function searchSeat() {
+    const input = document.getElementById("searchName").value.trim().toLowerCase();
+    let found = false;
+    let seatNumber = 0;
+
+    for (let i = 0; i < currentSeats.length; i++) {
+      const student = currentSeats[i];
+      if (student) {
+        seatNumber++;
+        if (
+          student.name.toLowerCase().includes(input) ||
+          student.id === input
+        ) {
+          document.getElementById("result").textContent =
+            `✅ 出席番号 ${student.id} の ${student.name} さんの席は ${seatNumber} 番の位置です。`;
+          found = true;
+          break;
+        }
+      }
+    }
+
+    if (!found) {
+      document.getElementById("result").textContent = "❌ 見つかりませんでした。";
+    }
+  }
+
+  window.onload = shuffleSeats;
+</script>
+
+</body>
+</html>
